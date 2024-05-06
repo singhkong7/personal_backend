@@ -2,7 +2,7 @@ const express=require('express');
 const path=require('path');
 const app=express();
 const port=8000;
-const Users=require('./db/app');
+const Users=require('./app');
 
 // const staticPath=path.join(__dirname,'./public');
 // app.use(express.static(staticPath));
