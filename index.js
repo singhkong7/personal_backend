@@ -1,6 +1,7 @@
 require('dotenv').config()
 const express=require('express');
 const path=require('path');
+const bcrypt=require('bcryptjs');
 const app=express();
 const port=process.env.PORT || 8000;
 const Users=require('./app');
@@ -8,15 +9,14 @@ const Users=require('./app');
 
 app.use(express.json());
 
-app.get('/',(req,res)=>{
-    res.send(`Welcome to Priyansh's Port`);
-});
+// app.get('/',(req,res)=>{
+//     res.send(`Welcome to Priyansh's Port`);
+// });
 
 
 // app.get('/users',async(req,res)=>{
 //     try{
 //         const listOfUsers=await Users.find();
-//         console.log("listOfUsers>>>",listOfUsers);
 //         res.send(listOfUsers);
 //     }
 //     catch(e){
@@ -33,6 +33,31 @@ app.post('/register',(req,res)=>{
     })
 
 })
+
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await Users.findOne({ email });
+        if (!user) {
+            return res.status(401).json(user);
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if(isPasswordValid)
+        {
+            res.status(201).send({Message:"User Logged in successfully"});
+        }
+        else
+        {
+            return res.status(401).json({ error: 'Invalid email or password' });
+        }        
+
+        
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 // app.patch('/users/:id',async(req,res)=>{
 //     try

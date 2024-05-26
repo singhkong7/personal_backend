@@ -32,9 +32,7 @@ const userSchema=new mongoose.Schema({
 
     userSchema.methods.generateAuthToken=async function(){
         try{
-            console.log("this._id",this._id)
             const token=jwt.sign({id:this._id.toString()},process.env.SECRET_KEY);
-            console.log("token",token);
             this.tokens=this.tokens.concat({token:token});
             await this.save();
             return token;
@@ -51,7 +49,7 @@ const userSchema=new mongoose.Schema({
         }
         next();
     })
-const Users=new mongoose.model("Users",userSchema);  
+const Users=new mongoose.model("Users",userSchema); 
 
 
 
