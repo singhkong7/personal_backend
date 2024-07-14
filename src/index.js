@@ -4,7 +4,7 @@ const express=require('express');
 const app=express();
 const port=process.env.PORT || 8000;
 const routes=require('./routes/index');
-const { dbConnection } = require('./db/db');
+const dbConnection  = require('./db/db');
 
 
 
