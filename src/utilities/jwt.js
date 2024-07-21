@@ -1,4 +1,5 @@
 const jwt=require('jsonwebtoken');
+const constants = require('./constants');
 require('dotenv').config();
 
 
@@ -14,7 +15,7 @@ const jwtAuthMiddleware = (req, res, next) => {
         next();
     }catch(err){
         console.error(err);
-        res.status(401).json({ error: 'Token expired,Please try again!!!A' });
+        res.status(401).json({ error: constants.TOKEN_EXPIRY});
     }
 }
 

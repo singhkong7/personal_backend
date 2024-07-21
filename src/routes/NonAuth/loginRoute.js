@@ -6,6 +6,8 @@ const Users = require('../../schema/Users');
 const bcrypt = require('bcryptjs');
 const jwt=require('jsonwebtoken');
 const { generateToken } = require('../../utilities/jwt');
+const constants = require('../../utilities/constants');
+
 
 login.post('/', async (req, res) => {
     try {
@@ -19,16 +21,16 @@ login.post('/', async (req, res) => {
             const userInfo={"name":user.name,"email":user.email,"id":user._id}
             const token = generateToken(userInfo);
             res.status(200).json({
-            message: "User Logged in Successfully",
+            message: constants.LOGIN_SUCCESS,
             token,
-            "ExpiresIn":100
+            expiresIn:100
             });
         } else {
-            res.status(401).json({ error: 'Invalid email or password' });
+            res.status(401).json({ error: constants.INVALID_CREDENTIALS });
         }
     } catch (error) {
         console.error('Error logging in:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: constants.SERVER_ERROR });
     }
 });
 

@@ -2,6 +2,8 @@ const express = require('express');
 const register = express.Router();
 const Users = require('../../schema/Users');
 const bcrypt = require('bcryptjs');
+const constants = require('../../utilities/constants');
+
 
 register.post('/', async (req, res) => {
     try {
@@ -10,7 +12,7 @@ register.post('/', async (req, res) => {
         // Check if the user already exists
         const existingUser = await Users.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ error: 'User already exists' });
+            return res.status(400).json({ error: constants.DUPLICATE_USER_ERROR });
         }
         
         // Hash the password
@@ -26,10 +28,10 @@ register.post('/', async (req, res) => {
         
         await newUser.save();
         
-        res.status(201).json({ message: 'User created successfully' });
+        res.status(201).json({ message: constants.REGISTER_SUCCESS });
     } catch (error) {
         console.error('Error creating user:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: constants.SERVER_ERROR });
     }
 });
 
