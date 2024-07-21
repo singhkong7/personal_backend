@@ -16,7 +16,6 @@ register.post('/', async (req, res) => {
         // Hash the password
         const salt=await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        console.log("hashPassword",hashedPassword);
         // Create a new user
         const newUser = new Users({
             email,
