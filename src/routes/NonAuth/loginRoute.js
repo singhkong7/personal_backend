@@ -23,7 +23,7 @@ login.post('/', async (req, res) => {
             res.status(200).json({
             message: constants.LOGIN_SUCCESS,
             token,
-            expiresIn:100
+            expiresIn:36000
             });
         } else {
             res.status(401).json({ error: constants.INVALID_CREDENTIALS });

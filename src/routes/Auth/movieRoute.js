@@ -1,10 +1,32 @@
 const express = require('express');
 const movieRoute = express.Router();
+const multer = require('multer');
 const Movies=require('../../schema/Movies');
 
-movieRoute.post('/', async (req, res) => {
+
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './public/uploads/'); // Uploads will be stored in './uploads/' directory
+    },
+    filename: function (req, file, cb) { 
+        cb(null, `${Date.now()}-${file.originalname}`); // Unique filename with original extension
+    }
+});
+
+const upload = multer({ storage: storage });
+
+
+movieRoute.post('/', upload.single('poster'), async (req, res) => {
     try {
-        const movie = new Movies(req.body);
+        const { title, year, rating, type } = req.body;
+        const movie = new Movies({
+            title,
+            year,
+            rating,
+            type,
+            poster: req.file.path
+        });
         await movie.save();
         res.status(201).send(movie);
     } catch (error) {
@@ -36,21 +58,35 @@ movieRoute.get('/:id', async (req, res) => {
 });
 
 // Update a movie by ID
-movieRoute.patch('/:id', async (req, res) => {
-    const updates = Object.keys(req.body);
-    const allowedUpdates = ['title', 'year', 'rating', 'type', 'poster'];
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' });
-    }
-
+movieRoute.put('/:id', upload.single('poster'), async (req, res) => {
     try {
-        const movie = await Movies.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const { title, year, rating, type } = req.body;
+        const movieId = req.params.id;
+
+        // Find the movie by ID
+        const movie = await Movies.findById(movieId);
+
         if (!movie) {
-            return res.status(404).send();
+            return res.status(404).send({ error: 'Movie not found' });
         }
-        res.send({Message:"Movie updated successfully"});
+
+        // Update movie details
+        movie.title = title;
+        movie.year = year;
+        movie.rating = rating;
+        movie.type = type;
+
+        // Update poster if a new one is uploaded
+        if (req.file) {
+            movie.poster = req.file.path;
+        }
+
+        // Save updated movie
+        await movie.save();
+
+        res.status(200).send({"message":"Movie details updated successfully",
+            data:movie
+        });
     } catch (error) {
         res.status(400).send(error);
     }
